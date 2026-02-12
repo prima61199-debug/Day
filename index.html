@@ -1,16 +1,160 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>For My Love</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Be My Valentine?</title>
+    <style>
+   body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial;
+    text-align: center;
+    overflow: hidden;
+
+    background: url("bg.jpg") no-repeat center center/cover;
+}
+
+
+        .container {
+            position: relative;
+        }
+
+        h1, p {
+            color: white;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        #yes {
+            background: white;
+        }
+
+        #no {
+            position: absolute;
+            background: #ff4d6d;
+            color: white;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Hi Shonuuu ❤️</h1>
-        <p>I made this just for you</p>
-        <button onclick="showMessage()">Click Me</button>
-    </div>
 
-    <script src="script.js"></script>
+<audio id="bgMusic" src="song.mp3" loop></audio>
+
+<div class="container">
+    <h1>Will you be my Valentine? ❤️</h1>
+    <p id="loveLine"></p>
+    <button id="yes">Yes</button>
+    <button id="no">No</button>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+    const noBtn = document.getElementById("no");
+    const yesBtn = document.getElementById("yes");
+    const loveLine = document.getElementById("loveLine");
+    const music = document.getElementById("bgMusic");
+
+    let noCount = 0;
+
+    const messages = [
+        "Are you suer? 🥺",
+        "Think again dikuu ❤️",
+        "I promise chocolates cake 🍫",
+        "I’ll plan cute dates for us 🌸",
+        "You’re my favorite person in whole world💕",
+        "Still no? 😭",
+        "You are my world ✨",
+        "I’ll cook for you and will do dishes😌",
+        "Last chance... ❤️",
+        "Now you HAVE to say yes 😏"
+    ];
+
+    noBtn.addEventListener("click", () => {
+        if (noCount < 10) {
+            loveLine.textContent = messages[noCount];
+            yesBtn.style.transform = `scale(${1 + noCount * 0.15})`;
+            noCount++;
+        }
+
+        if (noCount >= 10) {
+            yesBtn.style.transform = "scale(2.5)";
+        }
+    });
+
+    noBtn.addEventListener("mouseover", () => {
+        const x = Math.random() * (window.innerWidth - 120);
+        const y = Math.random() * (window.innerHeight - 60);
+        noBtn.style.left = x + "px";
+        noBtn.style.top = y + "px";
+    });
+
+    yesBtn.addEventListener("click", () => {
+        music.play();
+        document.body.innerHTML =
+            "<h1 style='color:white;'>YAYYYY ❤️ You are my forever Valentine!</h1>";
+        startConfetti();
+    });
+
+    // Simple confetti
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    function startConfetti() {
+        let pieces = [];
+        for (let i = 0; i < 150; i++) {
+            pieces.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 6 + 4,
+                d: Math.random() * 50
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            pieces.forEach(p => {
+                ctx.moveTo(p.x, p.y);
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, true);
+            });
+            ctx.fill();
+            update();
+        }
+
+        function update() {
+            pieces.forEach(p => {
+                p.y += Math.cos(p.d) + 2;
+                if (p.y > canvas.height) {
+                    p.y = 0;
+                }
+            });
+        }
+
+        setInterval(draw, 20);
+    }
+</script>
+
 </body>
 </html>
+
