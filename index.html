@@ -2,23 +2,28 @@
 <html>
 <head>
     <title>Be My Valentine?</title>
+
     <style>
-   body {
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial;
-    text-align: center;
-    overflow: hidden;
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            overflow: hidden;
 
-    background: url("bg.jpg") no-repeat center center/cover;
-}
-
+            /* Make sure filename matches exactly */
+            background-image: url("bg.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
 
         .container {
             position: relative;
+            z-index: 2;
         }
 
         h1, p {
@@ -51,10 +56,21 @@
             left: 0;
             pointer-events: none;
         }
+
+        /* Optional dark overlay */
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 1;
+        }
     </style>
 </head>
+
 <body>
 
+<!-- Make sure this filename matches exactly -->
 <audio id="bgMusic" src="song.mp3" loop></audio>
 
 <div class="container">
@@ -75,19 +91,19 @@
     let noCount = 0;
 
     const messages = [
-        "Are you suer? 🥺",
-        "Think again dikuu ❤️",
-        "I promise chocolates cake 🍫",
-        "I’ll plan cute dates for us 🌸",
-        "You’re my favorite person in whole world💕",
+        "Are you sure? 🥺",
+        "Think again ❤️",
+        "I promise chocolates 🍫",
+        "I’ll plan cute dates 🌸",
+        "You’re my favorite person 💕",
         "Still no? 😭",
         "You are my world ✨",
-        "I’ll cook for you and will do dishes😌",
+        "I’ll cook for you 😌",
         "Last chance... ❤️",
         "Now you HAVE to say yes 😏"
     ];
 
-    noBtn.addEventListener("click", () => {
+    function handleNo() {
         if (noCount < 10) {
             loveLine.textContent = messages[noCount];
             yesBtn.style.transform = `scale(${1 + noCount * 0.15})`;
@@ -97,25 +113,28 @@
         if (noCount >= 10) {
             yesBtn.style.transform = "scale(2.5)";
         }
-    });
 
-    noBtn.addEventListener("mouseover", () => {
         const x = Math.random() * (window.innerWidth - 120);
         const y = Math.random() * (window.innerHeight - 60);
         noBtn.style.left = x + "px";
         noBtn.style.top = y + "px";
-    });
+    }
+
+    noBtn.addEventListener("mouseover", handleNo);
+    noBtn.addEventListener("click", handleNo);
 
     yesBtn.addEventListener("click", () => {
-        music.play();
+        music.volume = 1;
+        music.play().catch(() => {});
         document.body.innerHTML =
-            "<h1 style='color:white;'>YAYYYY ❤️ You are my forever Valentine!</h1>";
+            "<h1 style='color:white; position:relative; z-index:2;'>YAY ❤️ You are my forever Valentine!</h1>";
         startConfetti();
     });
 
-    // Simple confetti
+    /* Confetti */
     const canvas = document.getElementById("confetti");
     const ctx = canvas.getContext("2d");
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -136,7 +155,7 @@
             ctx.beginPath();
             pieces.forEach(p => {
                 ctx.moveTo(p.x, p.y);
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, true);
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             });
             ctx.fill();
             update();
@@ -157,4 +176,3 @@
 
 </body>
 </html>
-
