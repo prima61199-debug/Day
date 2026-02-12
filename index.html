@@ -1,99 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Be My Valentine?</title>
+    <title>Will You Be My Valentine?</title>
 
     <style>
-        body {
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
             height: 100vh;
-            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            text-align: center;
+            font-family: Arial, sans-serif;
             overflow: hidden;
 
-            background-image: url("bg.jpg");
+            background-image: url("bg.jpg"); /* match filename */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
 
-        .container {
-            position: relative;
-            z-index: 2;
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            pointer-events: none;
         }
 
-        h1, p {
+        .card {
+            position: relative;
+            z-index: 2;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
             color: white;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        p {
+            height: 24px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            position: relative;
         }
 
         button {
             padding: 12px 25px;
             font-size: 18px;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
             margin: 10px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            transition: 0.3s ease;
         }
 
         #yes {
             background: white;
+            color: black;
         }
 
         #no {
-            position: fixed; /* important fix */
+            position: absolute;
             background: #ff4d6d;
             color: white;
         }
 
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.35);
-            z-index: 1;
-        }
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            pointer-events: none;
+        .final {
+            font-size: 32px;
+            color: white;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
 
-<audio id="bgMusic" src="song.mp3" loop></audio>
+<audio id="music" src="song.mp3" loop></audio>
 
-<div class="container">
+<div class="overlay"></div>
+
+<div class="card">
     <h1>Will you be my Valentine? ❤️</h1>
-    <p id="loveLine"></p>
-    <button id="yes">Yes</button>
+    <p id="message"></p>
+
+    <div class="buttons">
+        <button id="yes">Yes</button>
+        <button id="no">No</button>
+    </div>
 </div>
 
-<button id="no">No</button>
-
-<canvas id="confetti"></canvas>
-
 <script>
-    const noBtn = document.getElementById("no");
     const yesBtn = document.getElementById("yes");
-    const loveLine = document.getElementById("loveLine");
-    const music = document.getElementById("bgMusic");
+    const noBtn = document.getElementById("no");
+    const message = document.getElementById("message");
+    const music = document.getElementById("music");
 
-    let noCount = 0;
+    let count = 0;
 
-    const messages = [
+    const lines = [
         "Are you sure? 🥺",
         "Think again ❤️",
         "I promise chocolates 🍫",
-        "I’ll plan cute dates 🌸",
-        "You’re my favorite person 💕",
+        "I'll plan cute dates 🌸",
+        "You're my favorite person 💕",
         "Still no? 😭",
         "You are my world ✨",
         "I’ll cook for you 😌",
@@ -101,29 +121,24 @@
         "Now you HAVE to say yes 😏"
     ];
 
-    function moveNoButton() {
-        const btnWidth = 120;
-        const btnHeight = 50;
-
-        const x = Math.random() * (window.innerWidth - btnWidth);
-        const y = Math.random() * (window.innerHeight - btnHeight);
-
-        noBtn.style.left = x + "px";
-        noBtn.style.top = y + "px";
+    function moveNo() {
+        const x = Math.random() * 250 - 125;
+        const y = Math.random() * 150 - 75;
+        noBtn.style.transform = `translate(${x}px, ${y}px)`;
     }
 
     function handleNo() {
-        if (noCount < 10) {
-            loveLine.textContent = messages[noCount];
-            yesBtn.style.transform = `scale(${1 + noCount * 0.15})`;
-            noCount++;
+        if (count < 10) {
+            message.textContent = lines[count];
+            yesBtn.style.transform = `scale(${1 + count * 0.15})`;
+            count++;
         }
 
-        if (noCount >= 10) {
-            yesBtn.style.transform = "scale(2.5)";
+        if (count >= 10) {
+            yesBtn.style.transform = "scale(2)";
         }
 
-        moveNoButton();
+        moveNo();
     }
 
     noBtn.addEventListener("mouseover", handleNo);
@@ -131,54 +146,14 @@
 
     yesBtn.addEventListener("click", () => {
         music.play().catch(() => {});
-        document.body.innerHTML =
-            "<h1 style='color:white; position:relative; z-index:2;'>YAY ❤️ You are my forever Valentine!</h1>";
-        startConfetti();
+        document.body.innerHTML = `
+            <div class="overlay"></div>
+            <div class="final">
+                YAY ❤️<br>
+                You are my forever Valentine!
+            </div>
+        `;
     });
-
-    /* Confetti */
-    const canvas = document.getElementById("confetti");
-    const ctx = canvas.getContext("2d");
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    function startConfetti() {
-        let pieces = [];
-        for (let i = 0; i < 150; i++) {
-            pieces.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                r: Math.random() * 6 + 4,
-                d: Math.random() * 50
-            });
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "white";
-            ctx.beginPath();
-            pieces.forEach(p => {
-                ctx.moveTo(p.x, p.y);
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            });
-            ctx.fill();
-            update();
-        }
-
-        function update() {
-            pieces.forEach(p => {
-                p.y += Math.cos(p.d) + 2;
-                if (p.y > canvas.height) {
-                    p.y = 0;
-                }
-            });
-        }
-
-        setInterval(draw, 20);
-    }
-
-    moveNoButton(); // initial placement
 </script>
 
 </body>
